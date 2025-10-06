@@ -7,24 +7,36 @@ public class Server {
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(1234)) {
-            System.out.println("Server is waiting for a client connection on port 1234...");
+            System.out.println("Le serveur attend une connexion client sur le port 1234...");
+
+            // Le serveur attend indéfiniment une connexion client
             Socket clientSocket = serverSocket.accept();
-            System.out.println("A client has connected!");
+            System.out.println("Un client s'est connecté !");
 
+            // Outils pour recevoir et envoyer des données de type primitif (comme int)
             InputStream inputStream = clientSocket.getInputStream();
+            DataInputStream dis = new DataInputStream(inputStream);
             OutputStream outputStream = clientSocket.getOutputStream();
+            DataOutputStream dos = new DataOutputStream(outputStream);
 
-            int numberFromClient = inputStream.read();
-            System.out.println("Received number from client: " + numberFromClient);
+            // c) Le serveur, qui était en attente de ce nombre, le reçoit.
+            int numberFromClient = dis.readInt();
+            System.out.println("Nombre reçu du client : " + numberFromClient);
 
-            int result = numberFromClient * 2;
-            System.out.println("Calculation result: " + result);
+            // d) Le serveur calcule par exemple le produit x*5.
+            int result = numberFromClient * 5;
+            System.out.println("Résultat du calcul : " + result);
 
-            outputStream.write(result);
-            System.out.println("Sent result back to the client.");
+            // e) Le serveur envoie le résultat au client.
+            dos.writeInt(result);
+            System.out.println("Résultat envoyé au client.");
+
+            // Fermeture de la socket client une fois la transaction terminée
+            clientSocket.close();
+            System.out.println("Connexion avec le client terminée.");
 
         } catch (IOException e) {
-            System.err.println("An error occurred in the server: " + e.getMessage());
+            System.err.println("Une erreur est survenue sur le serveur : " + e.getMessage());
             e.printStackTrace();
         }
     }
